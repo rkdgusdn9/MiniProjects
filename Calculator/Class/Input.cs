@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Calculator.Class
 {
-	public class Input
+	public abstract class Input
 	{
 		public int input1;
 		public int input2;
@@ -10,6 +10,8 @@ namespace Calculator.Class
 		{
 			
 		}
+
+		public abstract void Result();
 	}
 }
 
