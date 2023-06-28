@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Calculator.Class
 {
-	public class PlusOperator : Input
+	public class PlusOperator : Operation
 	{
         public int plusResult;
 
@@ -10,9 +10,8 @@ namespace Calculator.Class
 		}
         public override void Result()
         {
-            plusResult = input1 + input2;
-            Console.WriteLine($"{input1} + {input2} = {plusResult}");
+            plusResult = userInput.input1 + userInput.input2;
+            Console.WriteLine($"{userInput.input1} + {userInput.input2} = {plusResult}");
         }
     }
 }
-

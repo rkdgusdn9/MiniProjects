@@ -1,8 +1,8 @@
 ﻿using System;
 namespace Calculator.Class
 {
-	public class MinusOperator : Input
-	{
+	public class MinusOperator : Operation
+    {
         public int minusResult;
 		public MinusOperator()
 		{

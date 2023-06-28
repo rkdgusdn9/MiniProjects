@@ -1,8 +1,8 @@
 ﻿using System;
 namespace Calculator.Class
 {
-	public class MultiplyOperator : Input
-	{
+	public class MultiplyOperator : Operation
+    {
         public int multiplyResult;
 		public MultiplyOperator()
 		{
