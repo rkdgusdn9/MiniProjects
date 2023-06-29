@@ -3,11 +3,12 @@ namespace Calculator.Class
 {
 	public abstract class Operation
 	{
-		public Input userInput;
+		public Input UserInput { get; set; }
 		public Operation()
 		{
+			UserInput = new Input();
 		}
-        public abstract void Result();
+        public abstract decimal Result();
     }
 }
 

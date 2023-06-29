@@ -3,14 +3,17 @@ namespace Calculator.Class
 {
 	public class MinusOperator : Operation
     {
-        public int minusResult;
-		public MinusOperator()
-		{
-		}
-        public override void Result()
+        public decimal minusResult { get; set; }
+        public MinusOperator(decimal input1, decimal input2) : base()
         {
-            minusResult = input1 - input2;
-            Console.WriteLine($"{input1} + {input2} = {minusResult}");
+            UserInput.input1 = input1;
+            UserInput.input2 = input2;
+        }
+        public override decimal Result()
+        {
+            minusResult = UserInput.input1 - UserInput.input2;
+            //Console.WriteLine($"{userInput.input1} + {userInput.input2} = {minusResult}");
+            return minusResult;
         }
     }
 }

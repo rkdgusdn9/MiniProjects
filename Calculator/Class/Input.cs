@@ -3,12 +3,12 @@ namespace Calculator.Class
 {
 	public class Input
 	{
-		public int input1;
-		public int input2;
+		public decimal input1;
+		public decimal input2;
 
 		public Input()
 		{
-			
+		
 		}
 	}
 }

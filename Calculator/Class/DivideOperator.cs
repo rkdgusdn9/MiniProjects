@@ -1,16 +1,19 @@
 ﻿using System;
 namespace Calculator.Class
 {
-	public class DivideOperator : Input
+	public class DivideOperator : Operation
     {
-        public int divideResult;
-		public DivideOperator()
-		{
-		}
-        public override void Result()
+        public decimal divideResult { get; set; }
+        public DivideOperator(decimal input1, decimal input2) : base()
         {
-            divideResult = input1 / input2;
-            Console.WriteLine($"{input1} + {input2} = {divideResult}");
+            UserInput.input1 = input1;
+            UserInput.input2 = input2;
+        }
+        public override decimal Result()
+        {
+            divideResult = UserInput.input1 / UserInput.input2;
+            //Console.WriteLine($"{userInput.input1} / {userInput.input2} = {divideResult}");
+            return divideResult;
         }
     }
 }

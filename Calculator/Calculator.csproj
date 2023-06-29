@@ -13,4 +13,7 @@
   <ItemGroup>
     <Folder Include="Class\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.editorconfig" />
+  </ItemGroup>
 </Project>
