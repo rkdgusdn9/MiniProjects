@@ -4,6 +4,14 @@ using Calculator.Class;
 namespace Calculator {
     class Program
     {
+
+        // Test Requirements
+        // 1 + 2 + 3 + 4 + 5 = 15       Eg. unlimited inputs
+        // 4 + (20 * 2) = 44 
+        // (4 / 2) * (5 - 3) + 1 =  5     Eg. complex inputs
+
+
+
         public static Input userInput = new Input();
         public static Operation operation = null;
         static void Main(string[] args)
@@ -54,7 +62,7 @@ namespace Calculator {
                     operation = new DivideOperator(userInput.input1, userInput.input2);
                     break;
             }
-            operation.Result();
+            operation.Result(); // 굳이 여기서 result 을 가져오는 이유는??
             return operation;
         }
     }
