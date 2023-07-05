@@ -9,7 +9,7 @@
             RunTest(3, "(5+2)*2", 14);
             RunTest(4, "5+(2*2)", 9);
             RunTest(5, "(5+2)*(6-2)", 28);
-            RunTest(5, "(1+2*2)-((3+4)/2)", 1.5m);
+            RunTest(6, "(1+2*2)-((3+4)/2)", 1.5m);
 
             Console.WriteLine("\n");
             Console.WriteLine("*  *Calculator * *");
