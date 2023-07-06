@@ -9,7 +9,114 @@ namespace Calculator.James
 
             var next = GetNextOperator(chars, 0);
 
-            return HandleOperator(chars, next.move, next.Operator, next.isOpen).Operator;
+            //return HandleOperator(chars, next.move, next.Operator, next.isOpen).Operator;
+
+            return HandleOperatorV2(chars, 0, false).Operator;
+        }
+
+        public static (ICalculate Operator, int skipTo) HandleOperatorV2(
+            IList<char> chars,
+            int startingIndex,
+            bool isOpenBracket)
+        {
+            ICalculate leftOperator = null;
+            IOperator mathOperator = null;
+
+            var i = startingIndex;
+            for (i = startingIndex; i < chars.Count;)
+            {
+                var current = GetNextOperator(chars, i);
+                i += current.move;
+
+                if (current.isOpen)
+                {
+                    var bracketGroup = HandleOperatorV2(chars, i, current.isOpen);
+                    if (leftOperator == null)
+                    {
+                        leftOperator = bracketGroup.Operator;
+                    }
+                    else
+                    {
+                        mathOperator.Add(bracketGroup.Operator);
+                    }
+                    i = bracketGroup.skipTo;
+                    continue;
+                }
+
+                if (current.isClose)
+                {
+                    return (mathOperator, i);
+                }
+
+                if (leftOperator == null)
+                {
+                    leftOperator = current.Operator;
+                }
+                else
+                {
+                    if (current.isNumber)
+                    {
+                        // Look ahead
+                        var next = GetNextOperator(chars, i);
+
+                        if (next.isClose)
+                        {
+                            if (isOpenBracket)
+                            {
+                                mathOperator.Add(current.Operator);
+                                return (mathOperator, i + 1);
+                            }
+                            else
+                            {
+                                mathOperator.Add(current.Operator);
+                                return (mathOperator, i);
+                            }
+                        }
+
+                        var nextOperator = next.Operator as IOperator;
+
+                        if (nextOperator == null || nextOperator.IsSameOperator(mathOperator))
+                        {
+                            // either no more operator found OR same next operator and just continue
+                            mathOperator.Add(current.Operator);
+                        }
+                        else if (nextOperator.Strength > mathOperator.Strength)
+                        {
+                            // go deeper because right operator should be handled as a result of a group
+                            var indexOfCurrentForNestToHandle = i - current.move;
+                            var nest = HandleOperatorV2(chars, indexOfCurrentForNestToHandle, current.isOpen);
+                            mathOperator.Add(nest.Operator);
+                            i = nest.skipTo;
+                        }
+                        else if (nextOperator.Strength <= mathOperator.Strength)
+                        {
+                            mathOperator.Add(current.Operator);
+                            leftOperator = mathOperator;
+                            mathOperator = null;
+                        }
+                        else
+                        {
+                            throw new Exception("Should not fall here but may be there could be some case?");
+                        }
+
+                    }
+                    else
+                    {
+                        if (mathOperator == null)
+                        {
+                            mathOperator = current.Operator as IOperator;
+                            mathOperator.Add(leftOperator);
+                        }
+                        
+                    }
+                }
+
+
+
+                var d = "";
+            }
+
+            return (mathOperator, i);
         }
 
         public static (ICalculate Operator, int skipTo) HandleOperator(
@@ -20,7 +127,6 @@ namespace Calculator.James
         {
             IOperator mathOperator = null;
 
-            //var skipIndex = 0;
             var i = currentIndex;
             for (i = currentIndex; i < chars.Count;)
             {

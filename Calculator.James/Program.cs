@@ -4,12 +4,18 @@
     {
         static void Main(string[] args)
         {
-            RunTest(1, "3+5+2", 10);
-            RunTest(2, "5+2*2", 9);
-            RunTest(3, "(5+2)*2", 14);
-            RunTest(4, "5+(2*2)", 9);
-            RunTest(5, "(5+2)*(6-2)", 28);
-            RunTest(6, "(1+2*2)-((3+4)/2)", 1.5m);
+            //RunTest(1, "3+5+2", 10);
+            //RunTest(2, "5+2*2", 9);
+            //RunTest(3, "5*2*2-2", 18);
+            //RunTest(4, "5/2*2", 5);
+            //RunTest(5, "3.2+55.222", 58.422m);
+
+            //RunTest(6, "(5+2)*2", 14);
+            //RunTest(7, "5+(2*2)", 9);
+            //RunTest(8, "(5+2)*(6-2)", 28);
+            //RunTest(9, "(1+2*2)-((3+4)/(4-2))", 1.5m);
+            //RunTest(10, "5+2*2", 9);
+            RunTest(11, "(((2.1+11.23)*2.3)*(7.22/9)/(2-3)-1)", 9);
 
             Console.WriteLine("\n");
             Console.WriteLine("*  *Calculator * *");
@@ -35,7 +41,8 @@
         {
             Console.WriteLine($"Test {index}: {input}");
             var result = Calculate(input);
-            Console.WriteLine($"  Result: {result}, Expected: {expectedResult}, Pass?: {result == expectedResult}");
+            Console.WriteLine($"       Actual: {result}, Expected: {expectedResult}");
+            Console.WriteLine($"       Pass?: {result == expectedResult}\n");
         }
     }
 }
