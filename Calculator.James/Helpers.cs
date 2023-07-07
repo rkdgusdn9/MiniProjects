@@ -7,10 +7,6 @@ namespace Calculator.James
         {
             var chars = stringInput.Replace(" ", "").Select(x => x).ToList();
 
-            var next = GetNextOperator(chars, 0);
-
-            //return HandleOperator(chars, next.move, next.Operator, next.isOpen).Operator;
-
             return HandleOperatorV2(chars, 0, false).Operator;
         }
 
@@ -28,188 +24,93 @@ namespace Calculator.James
                 var current = GetNextOperator(chars, i);
                 i += current.move;
 
+                var currentOperator = current.Operator;
+                var currentIsValue = current.isNumber;
+
                 if (current.isOpen)
                 {
                     var bracketGroup = HandleOperatorV2(chars, i, current.isOpen);
-                    if (leftOperator == null)
-                    {
-                        leftOperator = bracketGroup.Operator;
-                    }
-                    else
-                    {
-                        mathOperator.Add(bracketGroup.Operator);
-                    }
+                    currentOperator = bracketGroup.Operator;
                     i = bracketGroup.skipTo;
-                    continue;
+                    currentIsValue = true;
                 }
 
                 if (current.isClose)
                 {
-                    return (mathOperator, i);
+                    return (mathOperator == null ? leftOperator : mathOperator, i);
                 }
 
                 if (leftOperator == null)
                 {
-                    leftOperator = current.Operator;
-                }
-                else
-                {
-                    if (current.isNumber)
-                    {
-                        // Look ahead
-                        var next = GetNextOperator(chars, i);
-
-                        if (next.isClose)
-                        {
-                            if (isOpenBracket)
-                            {
-                                mathOperator.Add(current.Operator);
-                                return (mathOperator, i + 1);
-                            }
-                            else
-                            {
-                                mathOperator.Add(current.Operator);
-                                return (mathOperator, i);
-                            }
-                        }
-
-                        var nextOperator = next.Operator as IOperator;
-
-                        if (nextOperator == null || nextOperator.IsSameOperator(mathOperator))
-                        {
-                            // either no more operator found OR same next operator and just continue
-                            mathOperator.Add(current.Operator);
-                        }
-                        else if (nextOperator.Strength > mathOperator.Strength)
-                        {
-                            // go deeper because right operator should be handled as a result of a group
-                            var indexOfCurrentForNestToHandle = i - current.move;
-                            var nest = HandleOperatorV2(chars, indexOfCurrentForNestToHandle, current.isOpen);
-                            mathOperator.Add(nest.Operator);
-                            i = nest.skipTo;
-                        }
-                        else if (nextOperator.Strength <= mathOperator.Strength)
-                        {
-                            mathOperator.Add(current.Operator);
-                            leftOperator = mathOperator;
-                            mathOperator = null;
-                        }
-                        else
-                        {
-                            throw new Exception("Should not fall here but may be there could be some case?");
-                        }
-
-                    }
-                    else
-                    {
-                        if (mathOperator == null)
-                        {
-                            mathOperator = current.Operator as IOperator;
-                            mathOperator.Add(leftOperator);
-                        }
-                        
-                    }
-                }
-
-
-
-                var d = "";
-            }
-
-            return (mathOperator, i);
-        }
-
-        public static (ICalculate Operator, int skipTo) HandleOperator(
-            IList<char> chars, 
-            int currentIndex, 
-            ICalculate leftOperator, 
-            bool isOpeningBracket)
-        {
-            IOperator mathOperator = null;
-
-            var i = currentIndex;
-            for (i = currentIndex; i < chars.Count;)
-            {
-                var current = GetNextOperator(chars, i);
-                i += current.move;
-
-                if (isOpeningBracket)
-                {
-                    var bracketGroup = HandleOperator(chars, i, current.Operator, current.isOpen);
-                    leftOperator = bracketGroup.Operator;
-                    i = bracketGroup.skipTo;
-                    isOpeningBracket = false;
+                    leftOperator = currentOperator;
                     continue;
                 }
 
-                if (current.isOpen)
+                if (mathOperator == null)
                 {
-                    var mooov = GetNextOperator(chars, i);
-
-                    var bracketGroup = HandleOperator(chars, i, current.Operator, current.isOpen);
-                    mathOperator.Add(bracketGroup.Operator);
-                    i = bracketGroup.skipTo;
-                    isOpeningBracket = false;
+                    mathOperator = currentOperator as IOperator;
+                    mathOperator.Add(leftOperator);
                     continue;
                 }
 
-                if (current.isClose)
+                // Right operator as mathmatical operator
+                if (!currentIsValue)
                 {
-                    return (mathOperator, i);
-                }
-
-                if (current.isNumber)
-                {
-                    // look forward operator to see how to handle current right operation
-                    var forward = GetNextOperator(chars, i);
-
-                    if (forward.isClose)
+                    var currentOperatorAsIOperator = currentOperator as IOperator;
+                    if (mathOperator.IsSameOperator(currentOperatorAsIOperator))
                     {
-                        mathOperator.Add(current.Operator);
-                        return (mathOperator, i + forward.move);
+                        // if same operator just skip
+                        continue;
                     }
 
-                    var nextOperator = forward.Operator as IOperator;
-
-                    if (nextOperator == null || nextOperator.Strength == mathOperator.Strength)
+                    if (mathOperator.Strength >= currentOperatorAsIOperator.Strength)
                     {
-                        mathOperator.Add(current.Operator);
-                    }
-                    else if (nextOperator.Strength > mathOperator.Strength)
-                    {
-                        // go deeper because right operator should be handled in the nextnext operator group
-                        var deeperLayer = HandleOperator(chars, i, current.Operator, current.isOpen);
-                        mathOperator.Add(deeperLayer.Operator);
-                        i += deeperLayer.skipTo;
-                    }
-                    else if (nextOperator.Strength < mathOperator.Strength)
-                    {
-                        mathOperator.Add(current.Operator);
                         leftOperator = mathOperator;
+                        mathOperator = currentOperatorAsIOperator;
+                        mathOperator.Add(leftOperator);
+                        continue;
+                    }
+                }
+
+
+                // Right operator as numbers - look ahead to handle special cases
+                var next = GetNextOperator(chars, i);
+
+                if (next.isClose)
+                {
+                    if (isOpenBracket)
+                    {
+                        mathOperator.Add(currentOperator);
+                        return (mathOperator, i + 1);
                     }
                     else
                     {
-                        throw new Exception("Should not fall here but may be there could be some case?");
+                        mathOperator.Add(currentOperator);
+                        return (mathOperator, i);
                     }
                 }
-                else
+
+                var nextOperator = next.Operator as IOperator;
+
+                if (nextOperator == null || nextOperator.IsSameOperator(mathOperator))
                 {
-                    var newOperator = current.Operator as IOperator;
-                    if (mathOperator == null)
-                    {
-                        // this layer operator
-                        mathOperator = newOperator;
-                        mathOperator.Add(leftOperator);
-                    } 
-                    else if(mathOperator.IsSameOperator(newOperator))
-                    {
-                        // Do nothing as it continues same operator in this layer
-
-
-                    }
+                    // either no more operator found OR same next operator and just continue
+                    mathOperator.Add(currentOperator);
                 }
-
-                var d = "";
+                else if (nextOperator.Strength > mathOperator.Strength)
+                {
+                    // go deeper because right operator should be handled as a result of a group
+                    var indexOfCurrentForNestToHandle = i - current.move;
+                    var nest = HandleOperatorV2(chars, indexOfCurrentForNestToHandle, current.isOpen);
+                    mathOperator.Add(nest.Operator);
+                    i = nest.skipTo;
+                }
+                else if (nextOperator.Strength <= mathOperator.Strength)
+                {
+                    mathOperator.Add(currentOperator);
+                    leftOperator = mathOperator;
+                    mathOperator = null;
+                }
             }
 
             return (mathOperator == null ? leftOperator : mathOperator, i);
